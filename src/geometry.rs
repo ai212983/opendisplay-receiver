@@ -1,14 +1,8 @@
-//! Display geometry: the product-varying axes of the wire.
+//! Frame dimensions, pixel formats, and wire alignment.
 //!
-//! Wire layout is identical across products (row-major, MSB-first, one
-//! display packet in the config container); only the pixel
-//! extent and pixel format vary. Every frame-size gate in this crate derives
-//! from the geometry rather than a hardcoded constant, so Meditamer (600x600
-//! MONO, 45000 raw bytes) and Medinote (400x300 MONO, 15000 raw bytes) share
-//! one implementation, as do Picco's Monochrome (480x800, 48000 raw bytes)
-//! and Grayscale4 (480x800, 96000 raw bytes) modes. Rotation (e.g.
-//! Medinote's native portrait) is board-owned panel mapping, never wire
-//! layout.
+//! Each wire plane is row-major and MSB-first. Rows consist of whole bytes
+//! and are stored contiguously. The display adapter maps wire coordinates
+//! and shade indices to the physical panel.
 
 /// Wire pixel format: packs rows with no padding and selects the Flex
 /// `DisplayConfig` `color_scheme` advertisement.
@@ -123,8 +117,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn mono_vectors_unchanged() {
-        // Meditamer / Medinote vectors predate PixelFormat and must not move.
+    fn monochrome_frame_and_stride_sizes() {
         assert_eq!(DisplayGeometry::new(600, 600).frame_bytes(), Some(45_000));
         assert_eq!(DisplayGeometry::new(600, 600).stride_bytes(), Some(75));
         assert_eq!(DisplayGeometry::new(400, 300).frame_bytes(), Some(15_000));
@@ -140,7 +133,7 @@ mod tests {
     }
 
     #[test]
-    fn picco_480x800_both_formats() {
+    fn frame_and_stride_sizes_for_both_formats() {
         let mono = DisplayGeometry::with_format(480, 800, PixelFormat::Monochrome);
         assert_eq!(mono.frame_bytes(), Some(48_000));
         assert_eq!(mono.stride_bytes(), Some(60));

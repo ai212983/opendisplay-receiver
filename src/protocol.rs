@@ -42,8 +42,8 @@ pub const TRANSMISSION_MODE_ZIP: u8 = 0x02;
 /// rejected per the canonical namespaces.
 pub const TRANSMISSION_MODE_PIPE: u8 = 0x10;
 /// Default `transmission_modes`: direct-write plus ZIP plus the full-frame
-/// PIPE_WRITE subset. Products that cannot stage (e.g. Picco) pass
-/// [`TRANSMISSION_MODE_DIRECT_WRITE`] only via
+/// PIPE_WRITE subset. Receivers that accept only uncompressed direct-write
+/// can pass [`TRANSMISSION_MODE_DIRECT_WRITE`] via
 /// [`build_config_container_with_modes`].
 pub const TRANSMISSION_MODES_DEFAULT: u8 =
     TRANSMISSION_MODE_DIRECT_WRITE | TRANSMISSION_MODE_ZIP | TRANSMISSION_MODE_PIPE;
@@ -574,7 +574,6 @@ mod tests {
     #[test]
     fn raw_only_modes_and_gray_scheme() {
         let mono = DisplayGeometry::with_format(480, 800, PixelFormat::Monochrome);
-        // Picco direct-write-only: only the 0x08 bit set.
         let raw = build_config_container_with_modes(
             mono,
             IC_TYPE_ESP32_S3,

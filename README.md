@@ -6,12 +6,21 @@ The application supplies the radio transport, board identity, transfer buffers, 
 
 Use `DisplayGeometry::new` for monochrome or `DisplayGeometry::with_format` for four-gray frames. Four-gray frames contain two sequential MSB-first bitplanes. The display adapter applies its panel's shade mapping. Advertise the transfer modes your adapter implements and use `config_response_frame_with_limit` when a negotiated BLE ATT payload is smaller than the default response size.
 
+## Use in a Rust project
+
+Add the receiver to your Cargo manifest. It requires Rust 1.95 or newer.
+
+```toml
+[dependencies]
+opendisplay = { git = "https://github.com/ai212983/opendisplay-receiver.git", tag = "v0.1.1" }
+```
+
+The [crate documentation](src/lib.rs) shows how to initialize a receiver and get the required frame size.
+
 ## Test
 
 ```sh
 cargo test --locked
 ```
-
-The receiver was developed for Meditamer. Readesp32 added four-gray geometry, selectable transfer modes, and configurable response chunk sizes.
 
 Released under [MIT No Attribution](LICENSE). The compression dependency is [`miniz_oxide`](https://github.com/Frommi/miniz_oxide).

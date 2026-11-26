@@ -1,19 +1,20 @@
-//! Shared OpenDisplay receiver engine.
+//! OpenDisplay receiver engine for full-frame transfers.
 //!
-//! One transfer implementation for every product: the stock client speaks
-//! the same wire to all of them, so parsing, reassembly, ZIP/PIPE policy,
-//! generation tracking, and outcome settlement live here, tested once.
-//! Radio wiring (GATT tables, advertising, window deadlines, notify),
-//! supervisor handoff, buffer placement, and panel commit stay with the
-//! product adapter, which lends this engine its bytes on every call.
+//! The engine parses, reassembles, and validates direct-write and PIPE
+//! transfers. The application owns the transport and display and reports
+//! when a frame has been displayed.
 //!
-//! Ownership rule: this crate never allocates and never stores a frame
-//! byte. [`engine::TransferEngine`] holds small scalar descriptors only;
-//! staging, reorder slots, decode output, and inflater state arrive as
-//! caller slices. A Meditamer adapter lends PSRAM boxes; a target without
-//! a global external allocator lends carved byte ranges. Neither path can
-//! spill frame bytes onto the CPU stack or the internal heap by accident:
-//! every slice length is validated against the geometry before use.
+//! [`engine::TransferEngine`] stores transfer state. The caller supplies
+//! storage for frame staging, reorder slots, decode output, and the
+//! inflater. The engine checks buffer lengths against the frame geometry.
+//!
+//! ```
+//! use opendisplay::{engine::TransferEngine, geometry::DisplayGeometry};
+//!
+//! let geometry = DisplayGeometry::new(480, 800);
+//! let receiver = TransferEngine::new(geometry).expect("valid monochrome geometry");
+//! assert_eq!(receiver.frame_bytes(), 48_000);
+//! ```
 
 #![no_std]
 

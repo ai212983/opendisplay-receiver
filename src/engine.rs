@@ -218,8 +218,8 @@ pub enum CommitOutcome {
     Retired,
 }
 
-/// Single transfer implementation for all products. Construct once per
-/// product with its geometry; bulk bytes arrive per call.
+/// Transfer state for a display geometry. The caller supplies frame buffers
+/// with each operation that handles payload bytes.
 #[derive(Clone, Debug)]
 pub struct TransferEngine {
     frame_bytes: usize,
@@ -396,11 +396,8 @@ impl TransferEngine {
                     transfer.error = true;
                     return PipeDataOutcome::Fatal(nack);
                 }
-                // Raw sessions stop at the negotiated total even when the
-                // caller lends deeper staging (Medinote lends the shared
-                // 50 KB ZIP carve for raw too). Overshoot is a fatal DATA
-                // NACK, never a completion. Compressed streams stage
-                // opaquely; only the END decode bounds them.
+                // A caller may reuse a larger compressed-transfer buffer.
+                // Raw transfers still stop at the negotiated frame size.
                 if !transfer.compressed && next > transfer.total {
                     let nack = transfer.fatal(protocol::PIPE_DATA_NACK_WRITE);
                     transfer.error = true;

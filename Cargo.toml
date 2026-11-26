@@ -1,24 +1,12 @@
 [package]
 name = "opendisplay"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 rust-version = "1.95"
 description = "Allocation-free Rust receiver engine for the OpenDisplay protocol"
 license = "MIT-0"
 repository = "https://github.com/ai212983/opendisplay-receiver"
 
-# Shared OpenDisplay receiver engine: wire constants, geometry-parameterized
-# session validation, and the transfer state machine behind one interface.
-#
-# Products own radio wiring (GATT, advertising, supervisor handoff), bulk
-# buffer placement, and panel commit; this crate owns every transfer
-# decision both products must make identically toward the stock client:
-# reassembly, ZIP/PIPE validation, generation tracking, and outcome
-# settlement. Pure `core` plus the pinned inflater; no allocator, no
-# Embassy, no product or board dependency. Bulk bytes always stay
-# caller-owned: every method that touches frame bytes takes the caller's
-# slice, so a target without a global PSRAM allocator lends carved buffers
-# instead.
 [lib]
 
 [dependencies]
